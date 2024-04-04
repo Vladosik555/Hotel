@@ -19,7 +19,7 @@ namespace Hotel
             InitializeComponent();
             SearchLine.ForeColor = Color.Gray;
             Time.ForeColor = Color.Gray;
-            logger.Info("Initialized");
+            logger.Info("Инициализация");
         }
         /// <summary>
         /// Метод, который отображает часы
@@ -30,6 +30,7 @@ namespace Hotel
         {
             Timer.Start();
             Time.ForeColor = Color.Black;
+            logger.Info("Запуск таймера");
         }
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -48,6 +49,7 @@ namespace Hotel
         private void Timer_Tick(object sender, EventArgs e)
         {
             Time.Text = RealTimeOutput();
+            logger.Info("Запись реального времени в часы");
         }
 
         /// <summary>
@@ -62,6 +64,11 @@ namespace Hotel
                 SearchLine.Text = string.Empty;
                 SearchLine.ForeColor = Color.Black;
             }
+            else
+            {
+                logger.Warn("Не вывелась подсказка");
+            }
+            logger.Info("Подсказка поисковый строки");
         }
         private void SearchLine_Enter(object sender, EventArgs e)
         {
@@ -79,6 +86,11 @@ namespace Hotel
                 SearchLine.ForeColor = Color.Gray;
                 SearchLine.Text = "Поиск...";
             }
+            else
+            {
+                logger.Warn("Не вывелась подсказка");
+            }
+            logger.Info("Подсказка поисковый строки");
         }
         private void SearchLine_Leave(object sender, EventArgs e)
         {
@@ -91,90 +103,130 @@ namespace Hotel
         /// <param name="e"></param>
         public List<Room> BusyStatusDetection()
         {
-            using (var context = new SqliteContext())
+            try
             {
-                var rooms = context.Rooms.Where(r => r.Statuc.Equals("Занято"));
-                List<Room> roomsList = new List<Room>();
-                foreach (var room in rooms)
+                using (var context = new SqliteContext())
                 {
-                    roomsList.Add(room);
+                    var rooms = context.Rooms.Where(r => r.Statuc.Equals("Занято"));
+                    List<Room> roomsList = new List<Room>();
+                    foreach (var room in rooms)
+                    {
+                        roomsList.Add(room);
+                    }
+                    return roomsList;
                 }
-                return roomsList;
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal($"Не удалось подключится к базе данных, ошибка: {ex}");
+                return null;
             }
         }
         private void BusyButton_CheckedChanged(object sender, EventArgs e)
         {
             Tabel.DataSource = BusyStatusDetection();
             Tabel.Columns["Picture"].Visible = false;
+            logger.Debug("Добавляем все пользователей в таблицу со статусом 'Занято'");
         }
         /// <summary>
         /// При выборе статуса "Зарезервировано", будут отображаться пользователи только с этим статусом 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void DetectingTheStatusReserved()
+        public List<Room> DetectingTheStatusReserved()
         {
-            using (var context = new SqliteContext())
+            try
             {
-                var rooms = context.Rooms.Where(r => r.Statuc.Equals("Зарезервировано"));
-                List<Room> roomsList = new List<Room>();
-                foreach (var room in rooms)
+                using (var context = new SqliteContext())
                 {
-                    roomsList.Add(room);
+                    var rooms = context.Rooms.Where(r => r.Statuc.Equals("Зарезервировано"));
+                    List<Room> roomsList = new List<Room>();
+                    foreach (var room in rooms)
+                    {
+                        roomsList.Add(room);
+                    }
+                    return roomsList;
                 }
-                Tabel.DataSource = roomsList;
-                Tabel.Columns["Picture"].Visible = false;
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal($"Не удалось подключится к базе данных, ошибка: {ex}");
+                return null;
             }
         }
         private void ReservedButton_CheckedChanged(object sender, EventArgs e)
         {
-            DetectingTheStatusReserved();
+            Tabel.DataSource = DetectingTheStatusReserved();
+            Tabel.Columns["Picture"].Visible = false;
+            logger.Debug("Добавляем все пользователей в таблицу со статусом 'Зарезервировано'");
         }
         /// <summary>
         /// При выборе статуса "Свободные", будут отображаться пользователи только с этим статусом 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void IdentificationFfStatusAvailable()
+        public List<Room> IdentificationFfStatusAvailable()
         {
-            using (var context = new SqliteContext())
+            try
             {
-                var rooms = context.Rooms.Where(r => r.Statuc.Equals("Свободные"));
-                List<Room> roomsList = new List<Room>();
-                foreach (var room in rooms)
+                using (var context = new SqliteContext())
                 {
-                    roomsList.Add(room);
+                    var rooms = context.Rooms.Where(r => r.Statuc.Equals("Свободные"));
+                    List<Room> roomsList = new List<Room>();
+                    foreach (var room in rooms)
+                    {
+                        roomsList.Add(room);
+                    }
+                    return roomsList;
                 }
-                Tabel.DataSource = roomsList;
-                Tabel.Columns["Picture"].Visible = false;
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal($"Не удалось подключится к базе данных, ошибка: {ex}");
+                return null;
             }
         }
         private void FreeButton_CheckedChanged(object sender, EventArgs e)
         {
-            IdentificationFfStatusAvailable();
+            Tabel.DataSource = IdentificationFfStatusAvailable();
+            Tabel.Columns["Picture"].Visible = false;
+            logger.Debug("Добавляем все пользователей в таблицу со статусом 'Свободные'");
         }
         /// <summary>
         /// При выборе статуса "Выписываются", будут отображаться пользователи только с этим статусом 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void IdentificationFfStatusDischarged()
+        public List<Room> IdentificationFfStatusDischarged()
         {
-            using (var context = new SqliteContext())
+            try
             {
-                var rooms = context.Rooms.Where(r => r.Statuc.Equals("Выписываются"));
-                List<Room> roomsList = new List<Room>();
-                foreach (var room in rooms)
+                using (var context = new SqliteContext())
                 {
-                    roomsList.Add(room);
+                    var rooms = context.Rooms.Where(r => r.Statuc.Equals("Выписываются"));
+                    if(rooms != null)
+                    {
+
+                    }
+                    List<Room> roomsList = new List<Room>();
+                    foreach (var room in rooms)
+                    {
+                        roomsList.Add(room);
+                    }
+                    return roomsList;
                 }
-                Tabel.DataSource = roomsList;
-                Tabel.Columns["Picture"].Visible = false;
+            }
+            catch(Exception ex) 
+            {
+                logger.Fatal($"Не удалось подключится к базе данных, ошибка: {ex}");
+                return null;
             }
         }
         private void DischargedButton_CheckedChanged(object sender, EventArgs e)
         {
-            IdentificationFfStatusDischarged();
+            Tabel.DataSource = IdentificationFfStatusDischarged();
+            Tabel.Columns["Picture"].Visible = false;
+            logger.Debug("Добавляем все пользователей в таблицу со статусом 'Свободные'");
         }
         /// <summary>
         /// При нажатии строки, будет высвечиватся информация о пользователе
@@ -205,6 +257,10 @@ namespace Hotel
                     {
                         imageBytes1 = (byte[])selectedRow.Cells["Picture"].Value;
                     }
+                    else
+                    {
+                        logger.Error("Невозможно преобразовать фотографию в массив байтов");
+                    }
                     if (imageBytes1 != null)
                     {
                         MemoryStream memoryStream = new MemoryStream(imageBytes1);
@@ -212,7 +268,7 @@ namespace Hotel
                     }
                     else
                     {
-
+                        logger.Warn("Невозможно вывести фотографию");
                     }
                     ViewButton.Visible = true;
                 }
@@ -234,17 +290,24 @@ namespace Hotel
         /// <param name="e"></param>
         private void SearchButton_Click(object sender, EventArgs e)
         {
-            using (var context = new SqliteContext())
+            try
             {
-                string value = SearchLine.Text;
-                var rooms = context.Rooms.Where(r => r.FullName.Equals(value));
-                List<Room> roomList = new List<Room>();
-                foreach (var room in rooms)
+                using (var context = new SqliteContext())
                 {
-                    roomList.Add(room);
+                    string value = SearchLine.Text;
+                    var rooms = context.Rooms.Where(r => r.FullName.Equals(value));
+                    List<Room> roomList = new List<Room>();
+                    foreach (var room in rooms)
+                    {
+                        roomList.Add(room);
+                    }
+                    Tabel.DataSource = roomList;
+                    Tabel.Columns["Picture"].Visible = false;
                 }
-                Tabel.DataSource = roomList;
-                Tabel.Columns["Picture"].Visible = false;
+            } 
+            catch (Exception ex)
+            {
+                logger.Fatal($"Невозможно подключится к базе данных, ошибка: {ex}");
             }
         }
         /// <summary>
@@ -257,27 +320,39 @@ namespace Hotel
             this.Hide();
             GuestCard guestCard = new GuestCard();
             guestCard.Show();
-            using (var context = new SqliteContext())
+            logger.Debug("Открытие карточки гостя");
+            try
             {
-                var persons = context.Rooms.Where(r => r.Id == ID);
-                List<Room> list = new List<Room>();
-                foreach (var room in persons)
+                using (var context = new SqliteContext())
                 {
-                    list.Add(room);
+                    var persons = context.Rooms.Where(r => r.Id == ID);
+                    List<Room> list = new List<Room>();
+                    foreach (var room in persons)
+                    {
+                        list.Add(room);
+                    }
+                    if (list != null)
+                    {
+
+                    }
+                    Room person = list[0];
+                    guestCard.FullNameCard.Text = person.FullName;
+                    guestCard.DateOfBirth.Text = person.Birthday.ToString();
+                    guestCard.Payment.Text = person.Defrayment.ToString();
+                    guestCard.numericDays.Value = person.Days.Value;
+                    if (person.Animal == 1)
+                    {
+                        guestCard.checkAnimal.CheckState = CheckState.Checked;
+                    }
+                    else
+                    {
+                        guestCard.checkAnimal.CheckState = CheckState.Unchecked;
+                    }
                 }
-                Room person = list[0];
-                guestCard.FullNameCard.Text = person.FullName;
-                guestCard.DateOfBirth.Text = person.Birthday.ToString();
-                guestCard.Payment.Text = person.Defrayment.ToString();
-                guestCard.numericDays.Value = person.Days.Value;
-                if (person.Animal == 1)
-                {
-                    guestCard.checkAnimal.CheckState = CheckState.Checked;
-                }
-                else
-                {
-                    guestCard.checkAnimal.CheckState = CheckState.Unchecked;
-                }
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal($"Невозможно подключится к базе данных, ошибка: {ex}");
             }
         }
         /// <summary>
@@ -288,6 +363,7 @@ namespace Hotel
         private void CloseButton_Click(object sender, EventArgs e)
         {
             Application.Exit();
+            logger.Debug("Выход из приложения");
         }
         /// <summary>
         /// Метод для сворачивания приложения
@@ -297,6 +373,7 @@ namespace Hotel
         private void CollapseButton_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
+            logger.Debug("Сворачивание приложения");
         }
         /// <summary>
         /// Фильтрация строк таблице при введении имя пользователя
@@ -305,26 +382,33 @@ namespace Hotel
         /// <param name="e"></param>
         private void SearchLine_TextChanged(object sender, EventArgs e)
         {
-            using (var context = new SqliteContext())
+            try
             {
-                string personName = SearchLine.Text;
-                var roomsPerson = context.Rooms.Where(r => r.Statuc != "Свободные");
-                List<Room> rooms = new List<Room>();
-                List<string> names = new List<string>();
-                List<Room> foundGuests = new List<Room>();
-                foreach (var room in roomsPerson)
+                using (var context = new SqliteContext())
                 {
-                    names.Add(room.FullName);
-                    rooms.Add(room);
-                }
-                for (int i = 0; i < names.Count; i++)
-                {
-                    if (names[i].StartsWith(personName) && personName != string.Empty)
+                    string personName = SearchLine.Text;
+                    var roomsPerson = context.Rooms.Where(r => r.Statuc != "Свободные");
+                    List<Room> rooms = new List<Room>();
+                    List<string> names = new List<string>();
+                    List<Room> foundGuests = new List<Room>();
+                    foreach (var room in roomsPerson)
                     {
-                        foundGuests.Add(rooms[i]);
+                        names.Add(room.FullName);
+                        rooms.Add(room);
                     }
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        if (names[i].StartsWith(personName) && personName != string.Empty)
+                        {
+                            foundGuests.Add(rooms[i]);
+                        }
+                    }
+                    Tabel.DataSource = foundGuests;
                 }
-                Tabel.DataSource = foundGuests;
+            }
+            catch(Exception ex)
+            {
+                logger.Error($"Невозможно подключится к базе данных, ошибка: {ex}");
             }
         }
         

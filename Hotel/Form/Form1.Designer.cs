@@ -459,12 +459,12 @@
         private RadioButton ReservedButton;
         private Label TextStatus;
         private PictureBox SearchButton;
-        private TextBox SearchLine;
         private PictureBox WatchPicture;
         private Label Time;
         private PictureBox Menu;
         private System.Windows.Forms.Timer Timer;
         private Button CloseButton;
         private Button CollapseButton;
+        public TextBox SearchLine;
     }
 }
